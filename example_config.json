@@ -1,0 +1,22 @@
+{
+    "servers":[
+        {
+            "name":"Hub",
+            "file":"spigot-latest.jar",
+
+            "arguments":{
+                "before": "-Xms2G -Xmx4G",
+                "after": ""
+            },
+
+            "directory":"/root/servers/Hub/",
+            "command":"java_jar"
+        }
+    ],
+    
+    "commands": {
+        "java_jar": {
+            "command": "java $before -jar $file $after"
+        }
+    }
+}
