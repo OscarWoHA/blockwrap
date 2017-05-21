@@ -13,10 +13,16 @@
             "command":"java_jar"
         }
     ],
-    
+
     "commands": {
         "java_jar": {
             "command": "java $before -jar $file $after"
         }
+    },
+
+    "application": {
+        "default_server": "Hub",
+        "live_view_default": true,
+        "automatic_start_default": true
     }
 }

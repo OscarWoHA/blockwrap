@@ -53,6 +53,7 @@ var Server = function() {
             }
         });
 
+
         this.ps.on('close', (code) => {
             this.logMessage('Process killed');
             this.running = false;
@@ -69,10 +70,15 @@ var Server = function() {
     }
 
     this.stop = function() {
-        process.kill(-this.ps.pid, 'SIGKILL');
+        process.kill(-this.ps.pid, 'SIGINT');
     }
 
-    this.liveView = function(status) {
+
+    this.invokeCommand = function(cmd) {
+        this.ps.stdin.write(cmd + '\n');
+    }
+
+    this.setLiveView = function(status) {
         if(status) {
             for(index = 0; index < this.log.length; index++) {
                 console.log('['+ this.name + '] ' + this.log[index]);
@@ -104,6 +110,32 @@ var Application = function() {
             this.servers.push(serverInst);
         }
 
+        if(config.application.default_server) {
+            found = false;
+
+            for(index = 0; index < this.servers.length; index++) {
+                if(this.servers[index].name == config.application.default_server) {
+                    found = true;
+                    this.selected = index;
+
+                    console.log('Server ' + this.servers[index].name + ' selected.');
+                }
+            }
+
+            if(!found) {
+                console.log('[WARNING] No server found');
+            } else {
+                if(config.application.live_view_default) {
+                    this.servers[this.selected].setLiveView(true);
+                }
+
+                if(config.application.automatic_start_default) {
+                    this.servers[this.selected].start();
+                }
+            }
+        }
+
+
         rl.prompt();
         rl.on('line', (input) => {
             if(!input) {
@@ -121,14 +153,26 @@ var Application = function() {
                     break;
                 }
 
+                found = false;
+
                 for(index = 0; index < this.servers.length; index++) {
+                    if(this.servers[index].live) {
+                        this.servers[index].setLiveView(false);
+                    }
+
                     if(this.servers[index].name == args[0]) {
+                        found = true;
                         this.selected = index;
 
                         console.log('Server ' + this.servers[index].name + ' selected.');
                         break;
                     }
                 }
+
+                if(!found) {
+                    console.log('No server found');
+                }
+
                 break;
 
                 case 'START':
@@ -155,14 +199,14 @@ var Application = function() {
 
                 if(args[0] == 'true') {
                     if(!this.servers[this.selected].live) {
-                        this.servers[this.selected].liveView(true);
+                        this.servers[this.selected].setLiveView(true);
                         console.log('Live view enabled.');
                     } else {
                         console.log('Live view is already enabled!');
                     }
                 } else if (args[0] == 'false') {
                     if(this.servers[this.selected].live) {
-                        this.servers[this.selected].liveView(false);
+                        this.servers[this.selected].setLiveView(false);
                         console.log('Live view disabled.');
                     } else {
                         console.log('Live view is already disabled!');
@@ -187,7 +231,20 @@ var Application = function() {
                 break;
 
                 default:
-                console.log('Commands are: SELECT, STOP, START and LIVE');
+                if(this.selected != undefined && this.servers[this.selected].live) {
+                    this.servers[this.selected].invokeCommand(input);
+                    break;
+                }
+
+                console.log('Available commands are:');
+                if(this.selected != undefined) {
+                    console.log('Start - Starts the currently selected server');
+                    console.log('Stop - Stops the currently selected server');
+                    console.log('Live {true/false} - Enables or disables live console output and command ability');
+                } else {
+                    console.log('Select {name} - Selects a server based on name');
+                }
+
                 break;
             }
 
