@@ -1,4 +1,10 @@
 {
     "servers":[],
-    "commands": {}
+    "commands": {},
+    "application": {
+        "default_server": "",
+        "live_view_default": false,
+        "automatic_start_default": false
+    }
+
 }
