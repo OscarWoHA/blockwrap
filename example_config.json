@@ -2,7 +2,7 @@
     "servers":[
         {
             "name":"Hub",
-            "file":"spigot-latest.jar",
+            "runnable":"spigot-latest.jar",
 
             "arguments":{
                 "before": "-Xms2G -Xmx4G",
@@ -15,7 +15,7 @@
     ],
     
     "commands": {
-        "java_jar": {
+        "java_jar": { 
             "command": "java $before -jar $file $after"
         }
     }
