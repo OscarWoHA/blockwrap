@@ -18,6 +18,7 @@ class Server {
         this.process = spawn('/bin/sh', ['-c', `cd ${this.directory} && ${this.command}`]);
         
         this.process.stdout.on('data', (data) => {
+            console.log(data);
             self.log.push(data);
         });
 
