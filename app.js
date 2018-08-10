@@ -17,8 +17,9 @@ class Server {
 
         this.process = spawn('/bin/sh', ['-c', `cd ${this.directory} && ${this.command}`]);
         
+        this.process.stdout.setEncoding('utf8');
         this.process.stdout.on('data', (data) => {
-            console.log(data);
+            console.log(data.toString());
             self.log.push(data);
         });
 
